@@ -3,6 +3,62 @@ import {Container, Row, Col, CardGroup, Card, CardBlock, Button, Input, InputGro
 
 
 class Login extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      username: '',
+      password: ''
+    };
+
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+  }
+
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
+  }
+
+  handleLogin() {
+    var cors = require('cors');
+    cors.origin = false;
+
+    var username = this.state.username;
+    var password = this.state.password;
+    var authorizationCredentials = {
+      url: 'http://127.0.0.1:8080/',
+      clientId: 'egov_dashboard_app',
+      username: username,
+      password: password
+    };
+    var data = new FormData();
+    data.append("json", JSON.stringify(authorizationCredentials));
+    fetch('http://127.0.0.1:8080/authenticate/user', {
+      method: 'post',
+      headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'multipart/form-data',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: data
+    })
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(data) {
+      alert(JSON.stringify(data))
+    }).catch(function(err) {
+    	alert(err);
+    });
+  }
+
   render() {
     return (
       <div className="app flex-row align-items-center">
@@ -16,15 +72,15 @@ class Login extends Component {
                     <p className="text-muted">Sign In to your account</p>
                     <InputGroup className="mb-3">
                       <InputGroupAddon><i className="icon-user"></i></InputGroupAddon>
-                      <Input type="text" placeholder="Username"/>
+                      <Input type="text" name="username" value={this.state.username} onChange={this.handleInputChange} placeholder="Username"/>
                     </InputGroup>
                     <InputGroup className="mb-4">
                       <InputGroupAddon><i className="icon-lock"></i></InputGroupAddon>
-                      <Input type="password" placeholder="Password"/>
+                      <Input type="password" name="password" value={this.state.password} onChange={this.handleInputChange} placeholder="Password"/>
                     </InputGroup>
                     <Row>
                       <Col xs="6">
-                        <Button color="primary" className="px-4">Login</Button>
+                        <Button color="primary" className="px-4" onClick={this.handleLogin}>Login</Button>
                       </Col>
                       <Col xs="6" className="text-right">
                         <Button color="link" className="px-0">Forgot password?</Button>
